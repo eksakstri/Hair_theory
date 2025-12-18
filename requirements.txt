@@ -1,0 +1,9 @@
+streamlit 
+pillow 
+mediapipe 
+opencv-python 
+matplotlib 
+ultralytics 
+numpy 
+tensorflow 
+flask
