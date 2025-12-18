@@ -1,12 +1,16 @@
+import streamlit as st
 from PIL import Image
-from orient import align_face
+import mediapipe
 import cv2
+from matplotlib import pyplot as plt
 from ultralytics import YOLO
+import os
 import numpy as np
 from tensorflow.keras.models import load_model
 import tensorflow as tf
 from flask import Flask, request, jsonify
 import base64
+from orient import align_face
 
 app = Flask(__name__)
 
@@ -28,18 +32,14 @@ def focal_loss(gamma=2., alpha=0.25):
 
 def normalize_hsv(image_bgr):
     image_hsv = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2HSV).astype(np.float32)
-    image_hsv[..., 0] /= 179.0  
-    image_hsv[..., 1] /= 255.0  
-    image_hsv[..., 2] /= 255.0  
+    image_hsv[..., 0] /= 179.0
+    image_hsv[..., 1] /= 255.0
+    image_hsv[..., 2] /= 255.0
     return image_hsv
 
-add = r"C:\Users\saksham.tripathi\Desktop\hairs\app\white_curly_short_mid_mid.jpg"
-image = cv2.imread(add)
-image = align_face(image)
-cv2.imwrite(r"C:\Users\saksham.tripathi\Desktop\hairs\app\test\align.jpg", image)
-model = YOLO('best.pt')
-
 def pred(image):
+    image = align_face(image)
+    model = YOLO('best.pt')
     results = model(image)
     cropped_objects = {}
 
@@ -53,7 +53,7 @@ def pred(image):
             crop_img = image[y1:y2, x1:x2].copy()
 
             cropped_objects[cls_name] = crop_img
-        
+
     copy = cropped_objects.copy()
 
     if 'lear' not in cropped_objects.keys():
